@@ -11,12 +11,12 @@ class PWM {
   ~PWM();
 
   void setPositionMax(long int position);
-  void setFixEnable(bool value);
+  void setFix255Enable(bool value);
 
   int calculate(long int position);
 
  private:
-  bool fix_;
+  bool fix_255_;
   double divisor_;
   int const k_min_;
   int const k_max_;

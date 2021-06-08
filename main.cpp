@@ -8,7 +8,7 @@
 int main(int argc, char **argv) {
 
   PWM pwm(104, 945, 570);
-  pwm.setFixEnable(true);
+  pwm.setFix255Enable(true);
 
   for (auto i = 0; i <= 570; i++) {
     auto pwm_level = pwm.calculate(i);

@@ -18,7 +18,7 @@ void setup() {
   pinMode(PIN_OUTPUT, OUTPUT);
   Serial.begin(9600);
 
-  pwm.setFixEnable(true);
+  pwm.setFix255Enable(true);
 }
 
 void loop() {
