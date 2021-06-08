@@ -6,9 +6,10 @@
 #define PIN_OUTPUT 10
 #define PWM_LEVEL_MIN 104
 #define PWM_LEVEL_MAX 945
+#define ENCODER_VALUE_MAX 570
 
 Encoder encoder(PIN_ENCODER_2, PIN_ENCODER_1);
-PWM pwm(PWM_LEVEL_MIN, PWM_LEVEL_MAX, 570);
+PWM pwm(PWM_LEVEL_MIN, PWM_LEVEL_MAX, ENCODER_VALUE_MAX);
 
 void setup() {
   TCCR1A = 0b00000011;
@@ -31,9 +32,4 @@ void loop() {
   auto pwm_level = pwm.calculate(position_current);
   
   analogWrite(PIN_OUTPUT, pwm_level);
-
-  Serial.print("Encoder: ");
-  Serial.print(position_current);
-  Serial.print("; PWM: ");
-  Serial.println(pwm_level);
 }
