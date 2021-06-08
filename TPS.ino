@@ -8,7 +8,7 @@
 #define PWM_LEVEL_MAX 945
 
 Encoder encoder(PIN_ENCODER_2, PIN_ENCODER_1);
-PWM pwm(PWM_LEVEL_MIN, PWM_LEVEL_MAX);
+PWM pwm(PWM_LEVEL_MIN, PWM_LEVEL_MAX, 570);
 
 void setup() {
   TCCR1A = 0b00000011;
@@ -17,7 +17,6 @@ void setup() {
   pinMode(PIN_OUTPUT, OUTPUT);
   Serial.begin(9600);
 
-  pwm.setPositionMax(570);
   pwm.setFixEnable(true);
 }
 
