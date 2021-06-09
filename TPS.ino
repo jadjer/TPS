@@ -1,37 +1,18 @@
 #include <Encoder.h>
 
 constexpr int PIN_ENCODER_1 = 2;
-constexpr int PIN_ENCODER_2 3
-#define PIN_OUTPUT 10
-#define PWM_LEVEL_MIN 104
-#define PWM_LEVEL_MAX 945
-#define ENCODER_VALUE_MAX 570
+constexpr int PIN_ENCODER_2 = 3;
+constexpr int PIN_OUTPUT = 10;
+constexpr int PWM_LEVEL_MIN = 104;
+constexpr int PWM_LEVEL_MAX = 945;
 
-bool fix_255_;
-double divisor_;
-int const k_min_;
-int const k_max_;
-long int position_max_;
+long int position_max = 570;
+long int position_old = -999;
+auto divisorCalc = [&position_max, &PWM_LEVEL_MAX, &PWM_LEVEL_MIN]()-> double { return static_cast<double>(position_max) / (PWM_LEVEL_MAX - PWM_LEVEL_MIN); };
+double divisor = divisorCalc();
+auto pwmLevelCalc = [&divisor, &PWM_LEVEL_MIN](long int position)-> int { return static_cast<int>(static_cast<double>(position) / divisor) + PWM_LEVEL_MIN; };
 
 Encoder encoder(PIN_ENCODER_2, PIN_ENCODER_1);
-
-int PWM_Calculate(long int position) {
-  if (position > position_max_) {
-    divisorUpdate(position);
-  }
-
-  int pwm_level  = static_cast<int>(static_cast<double>(position) / divisor_) + k_min_;
-
-  if (fix_255_) {
-    pwm_level = fix255(pwm_level);
-  }
-
-  return pwm_level;
-}
-
-void PWM_DivisorUpdate() {
-  divisor_ = static_cast<double>(position_max_) / (k_max_ - k_min_);
-}
 
 void setup() {
   TCCR1A = 0b00000011;
@@ -39,23 +20,35 @@ void setup() {
   
   pinMode(PIN_OUTPUT, OUTPUT);
   Serial.begin(9600);
-
-//  pwm.setFix255Enable(true);
 }
 
 void loop() {
-//  auto position_current = encoder.read();
-//auto position_current = 12;
+  auto position = encoder.read();
   
-//  if (position_current < 0) {
-//    encoder.write(0);
-//    position_current = 0;
-//  }
+  if (position < 0) {
+    encoder.write(0);
+    position = 0;
+  }
 
-//  auto pwm_level = pwm.calculate(position_current);
+  if (position > position_max) {
+    position_max = position;
+    divisor = divisorCalc();
+  }
 
-  Serial.println("Hello");
-  delay(1000);
+  int pwm_level = pwmLevelCalc(position);
   
-//  analogWrite(PIN_OUTPUT, pwm_level);
+  if (pwm_level >= 255 and pwm_level <= 256) {
+    pwm_level = 256;
+  }
+  
+  analogWrite(PIN_OUTPUT, pwm_level);
+
+  if (position != position_old) {
+    position_old = position;
+    
+    Serial.print("Encoder: ");
+    Serial.print(position);
+    Serial.print("; PWM: ");
+    Serial.println(pwm_level);
+  }
 }
